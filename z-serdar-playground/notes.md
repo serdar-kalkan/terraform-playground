@@ -8,4 +8,6 @@
 * For Windows ssh compatibility: Putty for ssh connection to a host and puttygen for creating keys for connectivity
 * Never forget to destroy a test deployment after lab is complete. Otherwise instances created will not be terminated and consumer from the 1 month uptime in the first free year free tier.
 * .gitignore to ignore all runtime generated artifacts, cache, log etc is quite important. Also, required while avoiding the transfer of secrets into public repo.
+* Ansible (or other software provisioning automation tool) can be integrated with Terraform. First infrastructure is created with terraform and then the method to integrate can be different per tool e.g. Chef scripts can be used within terraform files, or with Ansible the out file of terraform can be used to provision the instances created
+* If due to some reason the software provisioning fails during an terraform apply, the instance and other resources creation still goes through (even though the operation is exited with an error alert) and resource creation is not rolled back. This is a watchpoint.
 
