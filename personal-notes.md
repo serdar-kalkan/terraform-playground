@@ -1,0 +1,1 @@
+Personal notes taken from terraform training. Will be maintained in the local private repo asides clone of the project. The prefix "personal-" will be used for naming convention, in case some other custom code or artifacts will be needed to be created during the training.
