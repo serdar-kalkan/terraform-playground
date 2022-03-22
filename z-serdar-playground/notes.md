@@ -28,7 +28,8 @@
     * Pattern: Reusable stack >> instantiating the stack instance=, which is a single stack definition managed in one project with an environment variable (string, number, or listmaps)
         * Configuring the instances per environment is another pattern called Wrapper Project.
     * Antipatterns: Copy-paste of the stack (may result in drift, verbose testing, consistency failure); multi-environment managed in one stack project
-* 
+* Application-driven infrastruce design includes creating the right application runtimes with the correct abstraction where infrastructue primitives (compute, storage, and networking) and other services are bundled together. This will allow application development teams to focus on their application rather than the infrastructure issues. Ways to create these runtimes could be creating Application servers, container clusters/application clusters, or FaaS (serverless code) -- where needs could be different per team. And it should be the goal of any platform team to create a solution for every specific need but creating abstracted solutions for different use-cases.
+* One of the the best practices for Terraform project structure is to have completely separated project directories for development and production. For increased quality and ease of testing, and also for complete isolation it is advised to have multiple AWS accounts: one for test, one for prod, and for billing (AWS organizations).
 
 # practice 
 * After downloading terraform binary from official website, on Mac create env variable so terraform can be used in any folder or path >>
@@ -41,9 +42,19 @@
 * If due to some reason the software provisioning fails during an terraform apply, the instance and other resources creation still goes through (even though the operation is exited with an error alert) and resource creation is not rolled back. This is a watchpoint.
 * "Modules" is an important concept while creating reusable terraform stack definitions e.g. for different environments or for different clients etc. A good lab: https://learn.hashicorp.com/tutorials/terraform/module-create
     * Advanced example of reusable modules with a lab: https://blog.gruntwork.io/how-to-create-reusable-infrastructure-with-terraform-modules-25526d65f73d
+    * A module does not automatically outputs the stack elements created in that module to the root module (main.tf). Outputs need to be expplicity set.
 * To be able to add resources created without Terraform in the cloud provider, you can use import command with the id of the resource e.g. instance id; to make those resources of the actual running terraform stack plan state. And then on they will continue to become a part of the plan.
 * For simple load tests, there is tool called stres, which you can download once after you logged into the instance (ec2) that you want to test: 
     * sudo apt-get install stress // instals tool called stress
     * stress --cpu 2 --timeout 300 //stres the cpu (?) for 300 hundred seconds 
+* Testing, and especially automated testing, is crucial in IaC. Offline testing (syntax validation, formatting/lintting and static code analysis, or testing against a mock API response set) and Online testing as a part of a delivery pipeline stage (test assertions to check existense, functionality and output of stack) by using 1) persistence test stacks (created once), 2) ephemeral test stack, 3) dual of both, 4) scheduled rebuild, 5) continuous stack (rebuilt everytime after each successful test and made ready for the next stage test) are some patterns. IaC can be useful in testing new IaC plans or making environment ready out of these patterns everytime new software code needs to be shipped. Orchestration of these testing strategies are critical via pipeline tools, by loosely coupling those tools via scripts rather than embedding logic.
+    * Test assertions: Conditions of the test case e.g. given {} ... doThis {} ... where syntax could be different compared to this pseuodo code per automation framework or testing tool
+    * Test fixtures: A static set of configuration, objects, data etc. that will help to execute tests when the component at the subject of testing is a provider or consumer type of component which means is dependent on upstream or downstream components/systems. I find this concept very similar to Pact/Contract driven testing
+    * Out-of-band job: ...
+* terraform console, helps to play around with interpolations in case there is a valid state (basically means, a terraform stack already applied) e.g. "the id of the instance launched is ${aws_instance.example.id}"
+* To create stack elements by setting some variables during terraform apply the command prompt syntax is: terraform apply -var 'varkey=varvalue' (for macos). This comes handy when using a stack which excepts creationg time instructions like environment variables rather than a tfvars file (which overrules this prompt).
+* State manipulation: It makes sense in some cases to manipulate existing stack's state created by Terraform: 1) State inspection: to see the list of resources created, but also to refresh state with the actual state of the resources declared in cloud platform, 2) Force re-creating: In case that a resource's definition is changed, Terraform automatically destroys and re-creates that resource the next time apply is executed. But in some cases, like server configuration (via cloud-init or local-exec or other provivisioner) is outdated in its content itself, there is a chance to "taint" that resource object even no change is visible to Terraform in this case (on the lower level), 3) Stop managing a resource via Terraform, 4) Disaster recovery: Forced pull or push of state file from or to a configured backend file/repo, in case DR is required manually.
+TO DO >> TEST: mv the name change, does it change the name in the destination cloud platform?
+
 
 
