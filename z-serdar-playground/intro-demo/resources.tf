@@ -10,11 +10,16 @@ variable "aws-region" {
 variable "AMIS" {
   type = map(string)
   default = {
-    "eu-east-1" = "my-test-ami"
+    "eu-east-1" = "ami-0f29c8402f8cce65c"
   }
 }
 
-resource "aws_instance" "sample-aws-instance" {
-  ami = var.AMIS[var.awsregion]
-  instance_instance_type = "t2.micro"
+# variable "instancename" {
+#   type = string
+# }
+
+resource "aws_instance" "test-aws-instance" {
+  # name = var.instancename
+  ami = var.AMIS[var.aws-region]
+  instance_type = "t2.micro"
 }
